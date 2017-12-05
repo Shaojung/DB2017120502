@@ -10,6 +10,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
     TextView tv;
     @Override
@@ -18,11 +22,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tv = (TextView) findViewById(R.id.textView);
         RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest request = new StringRequest("http://data.ntpc.gov.tw/od/data/api/BF90FA7E-C358-4CDA-B579-B6C84ADC96A1?$format=json",
+        final StringRequest request = new StringRequest("http://data.ntpc.gov.tw/od/data/api/BF90FA7E-C358-4CDA-B579-B6C84ADC96A1?$format=json",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        tv.setText(response.substring(0, 500));
+                        try {
+                            JSONArray array = new JSONArray(response);
+                            JSONObject obj = array.getJSONObject(0);
+                            String str = obj.getString("district");
+                            String addr = obj.getString("address");
+                            tv.setText(str + "," + addr);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 }, new Response.ErrorListener() {
             @Override
