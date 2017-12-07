@@ -11,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,23 +31,19 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
-                            JSONArray array = new JSONArray(response);
-                            data = new String[array.length()];
-                            for (int i=0;i<array.length();i++)
-                            {
-                                JSONObject obj = array.getJSONObject(i);
-                                String str = obj.getString("district");
-                                String addr = obj.getString("address");
-                                data[i] = str + "," + addr;
-                            }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                                    android.R.layout.simple_list_item_1, data);
-                            lv.setAdapter(adapter);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        Gson gson = new Gson();
+                        Animal[] newtaipei = gson.fromJson(response, Animal[].class);
+                        data = new String[newtaipei.length];
+                        for (int i=0;i<newtaipei.length;i++)
+                        {
+                            String str = newtaipei[i].district;
+                            String addr = newtaipei[i].address;
+                            data[i] = str + "," + addr;
                         }
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                                android.R.layout.simple_list_item_1, data);
+                        lv.setAdapter(adapter);
+
 
                     }
                 }, new Response.ErrorListener() {
